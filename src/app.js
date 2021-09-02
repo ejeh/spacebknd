@@ -10,18 +10,17 @@ import path from "path";
 
 import api from "./api";
 
-
 dotenv.config();
 
 const app = express();
 
-const FRONTEND_APP_URL =
-  process.env.NODE_ENV === "production"
-    ? process.env.FRONTEND_APP_URL
-    : "http://localhost:3000";
+// const FRONTEND_APP_URL =
+//   process.env.NODE_ENV === "production"
+//     ? process.env.FRONTEND_APP_URL
+//     : "http://localhost:3000";
 
 const corsOptions = {
-  origin: FRONTEND_APP_URL,
+  origin: "http://localhost:3000",
 
   credentials: true,
 };
@@ -36,7 +35,6 @@ const database =
   process.env.NODE_ENV === "production"
     ? process.env.DB_HOS
     : process.env.DB_HOST;
-
 
 // Configuring the database
 mongoose.Promise = global.Promise;
@@ -59,10 +57,10 @@ mongoose.set("useCreateIndex", true);
 
 // define a simple route
 app.get("/", (req, res) => {
-    res.json({ message: "Welcome to  Spaceinnovationhub API." });
- });
+  res.json({ message: "Welcome to  Spaceinnovationhub API." });
+});
 
- // modify request object
+// modify request object
 app.use((req, res, next) => {
   res.locals.userId = 0.0;
   res.locals.userType = "anonymous";
@@ -78,7 +76,6 @@ app.use((req, res, next) => {
   error.status = 404;
   next(error);
 });
- 
 
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
@@ -86,7 +83,7 @@ app.use((error, req, res, next) => {
     error: {
       message: `Spaceinnovationhub API says ${error.message}`,
     },
-  }); 
+  });
   next();
 });
 

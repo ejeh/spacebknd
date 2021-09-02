@@ -4,7 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "clean": "rm -rf build && mkdir build",
     "server": "nodemon ./src/index.js --exec babel-node",
+    "start": "NODE_ENV=production npm run build && node ./build/index.js",
+    "build-babel": "babel src -s -D -d build --presets @babel/preset-env",
+    "build": "npm run clean && npm run build-babel",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false  npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Godfrey Ejeh",
@@ -25,6 +30,7 @@
     "simple-encryptor": "^4.0.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.14.8",
     "@babel/core": "^7.15.0",
     "@babel/node": "^7.14.9",
     "@babel/plugin-transform-runtime": "^7.15.0",
