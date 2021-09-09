@@ -144,33 +144,58 @@ export const emailSignup = async (req, res) => {
     return fail(res, 500, `User with email already exist. ${email}`);
   }
 
-  let completeProfile;
+  let currentUser;
 
-  return hashPassword(password)
-    .then(async (hash) => {
-      const newUser = new User({
-        email: email,
-        password: hash,
-        completeProfile,
-        phone: phone,
-        fullname: fullname,
-        address: address,
-      });
-      await User.create(newUser).then((result) => {
+  return hashPassword(password).then(async (hash) => {
+    const newUser = new User({
+      email: email,
+      password: hash,
+      phone: phone,
+      fullname: fullname,
+      address: address,
+    });
+    await User.create(newUser)
+      .then((result) => {
         if (!result) {
           return fail(res, 404, "Error not found newly added user");
         }
-        return success(
-          res,
-          200,
-          result,
-          "New user record has been created successfully"
-        );
+
+        // Create JWT
+        currentUser = result;
+        return new Promise((resolve, reject) => {
+          jwt.sign(
+            {
+              payload: {
+                id: result.id,
+                email,
+              },
+            },
+            jwtSecret,
+            (err, token) => {
+              if (err) reject(err);
+              resolve(token);
+            }
+          );
+        });
+      })
+      .then((accessToken) => {
+        try {
+          const encrypted = encrypt(accessToken);
+          return success(
+            res,
+            200,
+            currentUser,
+            { accessToken: encrypted, id: currentUser.id },
+            "New user record has been created successfully"
+          );
+        } catch (err) {
+          return fail(res, 401, `"Unable to generate an access token"`);
+        }
+      })
+      .catch((err) => {
+        return fail(res, 500, `err ${err.message}`);
       });
-    })
-    .catch((err) =>
-      fail(res, 500, `Error encrypting user password. ${err.message}`)
-    );
+  });
 };
 
 // Login route
@@ -235,12 +260,15 @@ export async function emailLogin(req, res) {
             "Authentication successful!"
           );
         } catch (err) {
-          console.log(err);
-          return fail(res, 401, "Unable to generate an access token");
+          return fail(
+            res,
+            401,
+            `Unable to generate an access token ${err.message}`
+          );
         }
       })
       .catch((err) => {
-        return fail(res, 500, "Unable to authenticate user", err);
+        return fail(res, 500, `Unable to authenticate user ${err.message}`);
       });
   }
   return fail(

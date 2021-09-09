@@ -25,7 +25,6 @@ const UserSchema = new Schema(
     phone: { type: String, default: "" },
     address: { type: String, default: "" },
     date: { type: Date, default: Date.now },
-    completeProfile: { type: Boolean, default: false },
   },
   {
     timestamps: true,

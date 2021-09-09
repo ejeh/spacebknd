@@ -25,7 +25,6 @@ const AdminSchema = new Schema(
     fullname: { type: String, default: "" },
     phone: { type: String, default: "" },
     address: { type: String, default: "" },
-    completeProfile: { type: Boolean, default: false },
     updated: { type: Date, default: Date.now },
   },
   {
