@@ -11,21 +11,52 @@ import mongoose, { Schema } from "mongoose";
 
 const CourseSchema = new Schema(
   {
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: [true, "Why no user"],
+    image: {
+      type: String,
+      required: [true, "Why no image"],
+    },
+
+    fullName: {
+      type: String,
+      required: [true, "Why no full name"],
+    },
+
+    email: {
+      type: String,
+      required: [true, "Why no email"],
+    },
+    phone: {
+      type: String,
+      required: [true, "Why no phone"],
+    },
+    gender: {
+      type: String,
+      required: [true, "Why no gender"],
+    },
+    ageGroup: {
+      type: String,
+      required: [true, "Why no age"],
+    },
+    levelOfEducation: {
+      type: String,
+      required: [true, "Why no age"],
+    },
+    employmentStatus: {
+      type: String,
+      required: [true, "Why no employment status"],
     },
 
     courseName: {
       type: String,
-      default: "",
-      required: true,
+      required: [true, "Why no course name"],
     },
-    status: {
+    address: {
       type: String,
-      enum: ["completed", "pending"],
-      default: "pending",
+      required: [true, "Why no address"],
+    },
+    amount: {
+      type: String,
+      required: [true, "Why no amount"],
     },
     date: { type: Date, default: Date.now },
   },

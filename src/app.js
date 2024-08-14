@@ -14,13 +14,13 @@ dotenv.config();
 
 const app = express();
 
-// const FRONTEND_APP_URL =
-//   process.env.NODE_ENV === "production"
-//     ? process.env.FRONTEND_APP_URL
-//     : "http://localhost:3000";
+const FRONTEND_APP_URL =
+  process.env.NODE_ENV === "production"
+    ? process.env.FRONTEND_APP_URL
+    : "http://localhost:3000";
 
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: FRONTEND_APP_URL,
 
   credentials: true,
 };

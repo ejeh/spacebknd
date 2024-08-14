@@ -1,25 +1,71 @@
 import Course from "./model";
 import { success, fail, notFound } from "../../services/helpers/responses";
-import { findUserById } from "../user/contoller";
+import { uploads, deleteImage } from "../../services/cloudnary";
+import fs from "fs";
+import path from "path";
+import shortId from "shortid";
+import multer from "multer";
 
-export const findcourseByUser = (userId) => {
-  return Course.findOne({ user: userId }).then((result) => {
-    return result;
-  });
-};
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "../../../upload"));
+  },
+  filename: (req, file, cb) => {
+    cb(null, shortId.generate() + "-" + file.originalname);
+  },
+});
+
+export const upload = multer({
+  storage: storage,
+});
 
 // Course registration
 export const create = async (req, res) => {
   const data = req.body || {};
-  const { userId, userType } = res.locals;
-  if (userType !== "user") {
+  const file = req.file || {};
+
+  // validate request
+  if (!data.fullName) {
     return fail(
       res,
       422,
-      `Only Users are allowed to create a course not ${userType}`
+      "Full name can not be empty and must be alphanumeric."
     );
   }
-  // validate request
+  if (!data.email) {
+    return fail(res, 422, "Email can not be empty and must be alphanumeric.");
+  }
+  if (!data.gender) {
+    return fail(res, 422, "Gender can not be empty and must be alphanumeric.");
+  }
+  if (!data.employmentStatus) {
+    return fail(
+      res,
+      422,
+      "EmploymentStatus can not be empty and must be alphanumeric."
+    );
+  }
+
+  if (!data.address) {
+    return fail(res, 422, "Address can not be empty and must be alphanumeric.");
+  }
+  if (!data.amount) {
+    return fail(res, 422, "Amount can not be empty and must be alphanumeric.");
+  }
+  if (!data.levelOfEducation) {
+    return fail(
+      res,
+      422,
+      "Level of education can not be empty and must be alphanumeric."
+    );
+  }
+  if (!data.ageGroup) {
+    return fail(
+      res,
+      422,
+      "Age group can not be empty and must be alphanumeric."
+    );
+  }
   if (!data.courseName) {
     return fail(
       res,
@@ -27,19 +73,46 @@ export const create = async (req, res) => {
       "Course name can not be empty and must be alphanumeric."
     );
   }
-
-  let user;
-  try {
-    user = await findUserById(userId);
-  } catch (error) {
-    return fail(res, 422, "Unable to find User Information");
+  if (!data.phone) {
+    return fail(
+      res,
+      422,
+      "Phone number can not be empty and must be alphanumeric."
+    );
   }
-  if (!user) return fail(res, 422, "Unable to find User information");
+  if (!file.path) {
+    return fail(
+      res,
+      422,
+      "Bank payment receipt can not be empty and must be alphanumeric."
+    );
+  }
 
+  let new_path;
+
+  try {
+    const cloudUpload = async (path) => uploads(path, "courseReg");
+
+    const { path } = file;
+    new_path = await cloudUpload(path);
+
+    await fs.unlinkSync(path);
+  } catch (error) {
+    return fail(res, 422, error.message);
+  }
   const newObject = {};
-  newObject.user = userId;
   newObject.date = Date.now();
+  if (file.path) newObject.image = new_path.url;
+  if (data.fullName) newObject.fullName = data.fullName;
+  if (data.email) newObject.email = data.email;
+  if (data.gender) newObject.gender = data.gender;
+  if (data.employmentStatus) newObject.employmentStatus = data.employmentStatus;
+  if (data.address) newObject.address = data.address;
+  if (data.amount) newObject.amount = data.amount;
+  if (data.levelOfEducation) newObject.levelOfEducation = data.levelOfEducation;
+  if (data.ageGroup) newObject.ageGroup = data.ageGroup;
   if (data.courseName) newObject.courseName = data.courseName;
+  if (data.phone) newObject.phone = data.phone;
 
   // create a course
   const course = new Course(newObject);
