@@ -19,7 +19,7 @@ const FRONTEND_APP_URL =
     : "http://localhost:3000";
 
 const corsOptions = {
-  origin: FRONTEND_APP_URL,
+  origin: "https://keekcomputers.com/",
 
   credentials: true,
   optionsSuccessStatus: 200,
