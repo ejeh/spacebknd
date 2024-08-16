@@ -22,6 +22,7 @@ const corsOptions = {
   origin: FRONTEND_APP_URL,
 
   credentials: true,
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
